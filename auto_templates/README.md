@@ -14,8 +14,8 @@ contiains the credendials for the API user in PI
 ### get_template.py
 by default will get a list of all templates and the ID.
 
-use the "-t <id> -s" combination to see a schema (in JSON) for the tempalate.  You can use this in a python script to simplify the code for deploying a template
-It also tells you which paramaters are essential
+use the "-t <id> -s" combination to see a schema (in JSON) for the template.  You can use this in a python script to simplify the code for deploying a template
+It also tells you which template variables are essential
 
 ``` bash
 $ python get_template.py -t 541541 -s
@@ -49,3 +49,4 @@ $ python get_template.py -t 541541 -s
 }
 
 ```
+
