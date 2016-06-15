@@ -19,7 +19,7 @@ ID     IP address
 ```
 
 ### pi_config.py
-contiains the credendials for the API user in PI
+contains the credendials for the API user in PI
 
 ### get_template.py
 by default will get a list of all templates and the ID.
