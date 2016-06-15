@@ -8,6 +8,16 @@ is a script that applies the "Configure Interface" template to a device with the
 ### get_devices.py
 gets a list of devices and their ID from the PI inventory.
 
+``` bash
+$ ./get_devices.py 
+Getting all devices
+ID     IP address
+610619 10.10.10.115
+610620 10.10.7.2
+610621 100.1.1.5
+610622 10.10.8.100
+```
+
 ### pi_config.py
 contiains the credendials for the API user in PI
 
