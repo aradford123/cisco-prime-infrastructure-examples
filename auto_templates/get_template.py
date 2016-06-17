@@ -28,7 +28,7 @@ def make_schema(template_name, variables):
     for var in variables:
         if var['required']:
             print "                   #required"
-        print '                { "name": "%s", "value" : NONE }' % var['name']
+        print '                { "name": "%s", "value" : None }' % var['name']
     print """
               ]
         }
@@ -39,31 +39,52 @@ def make_schema(template_name, variables):
 }
 """ % template_name
 
-def show_a_template(template, schema):
+def build_template(cli_template):
+    return make_schema(cli_template['queryResponse']['entity'][0]['cliTemplateDTO']['name'],
+                    cli_template['queryResponse']['entity'][0]['cliTemplateDTO']['variables']['variable'])
+
+def get_template_by_name(template_name):
     '''
-    :param number: the template to show.  541541 was the configure_interface template
+    :param  name of template: the template to show.
     :return:
     '''
-    result = requests.get(BASE + "data/CliTemplate/%s.json?.full=true" % template, verify=False)
-    result.raise_for_status()
-    if not schema:
-        print json.dumps(result.json(), indent=2)
-    else:
-        make_schema(result.json()['queryResponse']['entity'][0]['cliTemplateDTO']['name'],
-                    result.json()['queryResponse']['entity'][0]['cliTemplateDTO']['variables']['variable'])
 
-def show_template(template, schema):
-    if template == None:
-        show_all_templates()
+    result = requests.get(BASE + 'data/CliTemplate.json?.full=true&name="%s"' % template_name, verify=False)
+    result.raise_for_status()
+
+    return result.json()
+
+def get_template_by_id(template_id):
+    '''
+    :param nubmer id template: the template to show.
+    :return:
+    '''
+
+    result = requests.get(BASE + "data/CliTemplate/%s.json?.full=true" % template_id, verify=False)
+    result.raise_for_status()
+    return json.dumps(result.json(), indent=2)
+
+def show_template(template_id, template_name, schema):
+    if template_id is not None:
+        template = get_template_by_id(template_id)
+    elif template_name is not None:
+        template = get_template_by_name(template_name)
+
+    if schema:
+        print build_template(template)
     else:
-        show_a_template(template, schema)
+        print json.dumps(template, indent=2)
 
 if __name__ == "__main__":
     parser = ArgumentParser(description='Select options.')
     parser.add_argument('-t', type=str,
-                        help="template details")
+                        help="template id")
+    parser.add_argument('-n', type=str, help="template by name")
     parser.add_argument('-s', action="store_true",
                         help="template schema")
 
     args = parser.parse_args()
-    show_template(args.t, args.s)
+    if args.t is not None or args.n is not None:
+        show_template(args.t, args.n, args.s)
+    else:
+        show_all_templates()

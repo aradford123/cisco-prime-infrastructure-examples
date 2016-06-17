@@ -24,11 +24,13 @@ def device_by_id(id):
     print json.dumps(result.json(), indent=2)
 
 def device_by_ip(ip):
-    print "Getting a specific device by IP address"
+
     result = requests.get(BASE + "data/Devices.json?.full=true&ipAddress=%s" % ip, verify=False)
     result.raise_for_status()
-    print json.dumps(result.json(), indent=2)
+    return result.json()
 
+def device_to_id(devicesearchDTO):
+    return devicesearchDTO['queryResponse']['entity'][0]['devicesDTO']['@id']
 
 
 if __name__ == "__main__":
@@ -42,6 +44,6 @@ if __name__ == "__main__":
     if args.id:
         device_by_id(args.id)
     elif args.ip:
-        device_by_ip(args.ip)
+        print json.dump(device_by_ip(args.ip), indent=2)
     else:
         all_devices()
