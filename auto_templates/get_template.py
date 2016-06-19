@@ -55,7 +55,6 @@ def get_template_by_name(template_name):
 
     result = requests.get(BASE + 'data/CliTemplate.json?.full=true&name="%s"' % template_name, verify=False)
     result.raise_for_status()
-    print(result.json())
     if result.json()["queryResponse"]["@count"] == "1":
         return result.json()
     else:

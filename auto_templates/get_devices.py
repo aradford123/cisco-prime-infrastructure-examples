@@ -9,6 +9,8 @@ from pi_config import PI, USER, PASSWORD
 
 BASE="https://%s:%s@%s/webacs/api/v1/" %(USER,PASSWORD,PI)
 
+class NoDeviceFound(Exception):
+    pass
 def all_devices():
     print ("Getting all devices")
     print ("{0:6s} {1:10s}".format("ID", "IP address"))
@@ -27,7 +29,10 @@ def device_by_ip(ip):
 
     result = requests.get(BASE + "data/Devices.json?.full=true&ipAddress=%s" % ip, verify=False)
     result.raise_for_status()
-    return result.json()
+    if result.json()['queryResponse']['@count'] == "1":
+        return result.json()
+    else:
+        raise NoDeviceFound("No device with ip: %s" %ip)
 
 def device_to_id(devicesearchDTO):
     return devicesearchDTO['queryResponse']['entity'][0]['devicesDTO']['@id']

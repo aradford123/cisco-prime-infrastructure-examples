@@ -8,6 +8,8 @@ from configure_interface import submit_template_job, wait_for_job, get_full_hist
 
 requests.packages.urllib3.disable_warnings()
 from pi_config import PI, USER, PASSWORD
+import logging
+logger = logging.getLogger(__name__)
 
 BASE="https://%s:%s@%s/webacs/api/v1/" %(USER,PASSWORD,PI)
 
@@ -45,7 +47,7 @@ def get_template(template):
     template_schema = build_template(template)
     return template_schema
 
-def process_template(device_ip, template, options):
+def process_template(template, options, device_ip):
     # find an augment the template
     template_schema = get_template(template)
     merge_template_vars(template_schema, options)
@@ -56,28 +58,49 @@ def process_template(device_ip, template, options):
 
     template_schema["cliTemplateCommand"]["targetDevices"]["targetDevice"]["targetDeviceID"] = device_id
     # modifies dict...
-    print ("Device {device:} Applying template {template}".format(device=device, template=json.dumps(template_schema, indent=2)))
+    print ("Applying template:'{template}' to device:{device}".format(template=template, device=device_ip))
+    logger.debug("Device {device:} Applying template {template}".format(device=device_id, template=json.dumps(template_schema, indent=2)))
 
     job = submit_template_job(BASE, template_schema)
 
-    print(json.dumps(job, indent=2))
+    logger.debug(json.dumps(job, indent=2))
 
-    jobname = job   ['mgmtResponse']['cliTemplateCommandJobResult']['jobName']
+    jobname = job['mgmtResponse']['cliTemplateCommandJobResult']['jobName']
+    jobmessage = job['mgmtResponse']['cliTemplateCommandJobResult']['message']
+    print("{jobmessage}\nWaiting for Job:{jobname}".format(jobmessage=jobmessage,jobname=jobname))
+    print("\n")
+
     jobresponse = wait_for_job(BASE, jobname)
-    print(json.dumps(jobresponse, indent=2))
+    job_status = jobresponse['queryResponse']['entity'][0]["jobSummaryDTO"]
+    print('user:{username} run:{runStatus} result:{resultStatus} Start:{lastStartTime} Stop:{completionTime}'.
+          format(username=job_status['username'], resultStatus=job_status['resultStatus'],
+                 runStatus=job_status['runStatus'],
+                 lastStartTime=job_status['lastStartTime'],
+                 completionTime=job_status['completionTime']))
+
+    logger.debug(json.dumps(jobresponse, indent=2))
 
     history = get_full_history(BASE, jobname)
-    print(json.dumps(history, indent=2))
+    if job_status['resultStatus'] == "SUCCESS":
+        print('For full job history: op/jobService/runhistory.json?jobName={jobname}'.format(jobname=jobname))
+    else:
+        print ("job history:", json.dumps(history['mgmtResponse']['job']['runInstances']['runInstance']['results']['result'], indent=2))
+    logger.debug(json.dumps(history, indent=2))
 
 
 if __name__ == "__main__":
     parser = ArgumentParser(description='Select options.')
-    parser.add_argument('-t', type=str,
+    parser.add_argument('-t', type=str, required=True,
                         help="template name")
     parser.add_argument('-d', type=str,
                         help="device  ip address")
-    parser.add_argument('-p', type=str,
-                        help="parameters")
+    parser.add_argument('-p', type=str, required=True,
+                        help="parameters for template: as a python dict "
+                             "e.g. '{\"arg1\" : \"val1\", \"arg2\" :\"val2\"}'  or '{}' for empty params")
+    parser.add_argument('-v', action='store_true',
+                        help="verbose")
     args = parser.parse_args()
+    if args.v:
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
-    process_template(args.d, args.t, json.loads(args.p))
+    process_template(args.t, json.loads(args.p), args.d)

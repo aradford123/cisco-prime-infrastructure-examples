@@ -4,7 +4,8 @@ import requests
 import json
 import time
 requests.packages.urllib3.disable_warnings()
-
+import logging
+logger = logging.getLogger(__name__)
 from pi_config import PI, USER, PASSWORD
 BASE="https://%s:%s@%s/webacs/api/v1/" %(USER,PASSWORD,PI)
 
@@ -74,7 +75,7 @@ def wait_for_job(base, jobname):
         status = result['queryResponse']['entityId'][0]['@displayName'].split(",")[-1]
 
         if status == "SCHEDULED":
-            print (status)
+            logger.info("Job Status: {status}... sleeping 5".format(status=status))
             time.sleep(5)
         else:
             json.dumps(result)
