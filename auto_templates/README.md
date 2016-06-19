@@ -3,7 +3,9 @@
 This directory contains some example python code for using configuration templates.
 
 ### configure_interface.py
-is a script that applies the "Configure Interface" template to a device with the id of 610622.  You should change this for your example
+is a script that applies the "Configure Interface" template to a device with the id of 610622.  It sets the interface "gig1/0/2" to access mode and assigns it to vlan 8.  It also updates the description.
+
+You should change this for your example
 
 ### get_devices.py
 gets a list of devices and their ID from the PI inventory.
@@ -29,34 +31,61 @@ It also tells you which template variables are essential
 
 ``` bash
 $ python get_template.py -t 541541 -s
-
 {
-  "cliTemplateCommand" : {
-    "targetDevices" : {
-      "targetDevice" : {
-        "targetDeviceID" : "<DEVICEID>",
-        "variableValues" : {
+  "cliTemplateCommand": {
+    "targetDevices": {
+      "targetDevice": {
+        "targetDeviceID": "<DEVICEID>", 
+        "variableValues": {
           "variableValue": [
-    
-                { "name": "Description", "value" : NONE }
-                   #required
-                { "name": "InterfaceName", "value" : NONE }
-                { "name": "NativeVLan", "value" : NONE }
-                { "name": "StaticAccessVLan", "value" : NONE }
-                { "name": "TrunkAllowedVLan", "value" : NONE }
-                { "name": "VoiceVlan", "value" : NONE }
-                { "name": "spd", "value" : NONE }
-                { "name": "A1", "value" : NONE }
-                { "name": "duplexField", "value" : NONE }
-                { "name": "PortFast", "value" : NONE }
-
-              ]
+            {
+              "name": "Description", 
+              "value": ""
+            }, 
+            {
+              "name": "InterfaceName", 
+              "value": "required"
+            }, 
+            {
+              "name": "NativeVLan", 
+              "value": ""
+            }, 
+            {
+              "name": "StaticAccessVLan", 
+              "value": ""
+            }, 
+            {
+              "name": "TrunkAllowedVLan", 
+              "value": ""
+            }, 
+            {
+              "name": "VoiceVlan", 
+              "value": ""
+            }, 
+            {
+              "name": "spd", 
+              "value": ""
+            }, 
+            {
+              "name": "A1", 
+              "value": ""
+            }, 
+            {
+              "name": "duplexField", 
+              "value": ""
+            }, 
+            {
+              "name": "PortFast", 
+              "value": ""
+            }
+          ]
         }
       }
-    },
-    "templateName" : "Configure Interface"
+    }, 
+    "templateName": "Configure Interface"
   }
 }
+
 
 ```
 
