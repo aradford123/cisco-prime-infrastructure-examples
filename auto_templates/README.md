@@ -27,7 +27,9 @@ contains the credendials for the API user in PI
 by default will get a list of all templates and the ID.
 
 use the "-t <id> -s" combination to see a schema (in JSON) for the template.  You can use this in a python script to simplify the code for deploying a template
-It also tells you which template variables are essential
+It also tells you which template variables are essential as these have a value of "required".
+
+It can also be run with the argument '-n "Configure Interface" ' to do a search by template name.
 
 ``` bash
 $ python get_template.py -t 541541 -s
