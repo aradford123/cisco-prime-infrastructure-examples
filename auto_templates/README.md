@@ -21,10 +21,28 @@ ID     IP address
 610620 10.10.7.2
 610621 100.1.1.5
 610622 10.10.8.100
+<SNIP>
 ```
 
 ### get_template.py
-by default will get a list of all templates and the ID.
+by default will get a list of all templates and their ID.
+
+``` bash
+$ python get_template.py
+541541 Configure Interface
+541542 HTTP SWIM Image Upgrade Template
+541543 IOS-XE Controller - Small Network
+541544 Embedded Event Manager Configuration-IOS
+541545 Preprovision
+541546 Mobility_Agent
+541547 Delete_Custom_Template
+541548 Delete_Vlan
+541549 Medianet - PerfMon
+541550 EtherChannel
+541551 RADIUS_AUTH
+541552 Guided_Workflow_Convert_MA_To_M
+<SNIP>
+```
 
 use the "-t <id> -s" combination to see a schema (in JSON) for the template.  You can use this in a python script to simplify the code for deploying a template
 It also tells you which template variables are essential as these have a value of "required".
