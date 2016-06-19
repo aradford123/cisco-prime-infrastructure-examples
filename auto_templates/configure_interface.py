@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+from __future__ import print_function
 import requests
 import json
 import time
@@ -32,12 +32,12 @@ CLI_TEMPLATE = {
               "name": "A1",
               "value": "Access"
             },
-            { "name": "NativeVLan", "value": None},
-            { "name": "duplexField","value": None},
-            { "name": "TrunkAllowedVLan","value": None },
-            { "name": "spd","value": None },
-            { "name": "VoiceVlan" ,"value": None},
-            { "name": "PortFast","value": None }
+            { "name": "NativeVLan", "value": ""},
+            { "name": "duplexField","value": ""},
+            { "name": "TrunkAllowedVLan","value": "" },
+            { "name": "spd","value": "" },
+            { "name": "VoiceVlan" ,"value": ""},
+            { "name": "PortFast","value": "" }
           ]
 
         }
@@ -48,55 +48,58 @@ CLI_TEMPLATE = {
 }
 
 
-def get_job_status(jobname):
-    url = BASE + 'data/JobSummary.json?jobName=%s' %jobname
+def get_job_status(base, jobname):
+    url = base + 'data/JobSummary.json?jobName=%s' %jobname
     jobresult = requests.get(url, verify=False)
     jobresult.raise_for_status()
     return jobresult.json()
 
-def get_job_detail(jobnumber):
-    url = BASE + 'data/JobSummary/%s.json' %jobnumber
+def get_job_detail(base, jobnumber):
+    url = base + 'data/JobSummary/%s.json' %jobnumber
     jobresult = requests.get(url, verify=False)
     jobresult.raise_for_status()
     return jobresult.json()
 
-def get_full_history(jobname):
-    url = BASE + 'op/jobService/runhistory.json?jobName=%s' %jobname
+def get_full_history(base, jobname):
+    url = base + 'op/jobService/runhistory.json?jobName=%s' %jobname
     jobresult = requests.get(url, verify=False)
     jobresult.raise_for_status()
     return jobresult.json()
 
-def wait_for_job(jobname):
+def wait_for_job(base, jobname):
     while True:
 
-        result = get_job_status(jobname)
+        result = get_job_status(base, jobname)
 
         status = result['queryResponse']['entityId'][0]['@displayName'].split(",")[-1]
 
         if status == "SCHEDULED":
-            print status
+            print (status)
             time.sleep(5)
         else:
             json.dumps(result)
             jobnumber = result['queryResponse']['entityId'][0]['$']
-            jobdetail = get_job_detail(jobnumber)
-            print json.dumps(jobdetail, indent=2)
+            jobdetail = get_job_detail(base, jobnumber)
             return jobdetail
 
+def submit_template_job(base, cli_template):
+    headers={"Content-Type" : "application/json"}
+    result = requests.put(base + "op/cliTemplateConfiguration/deployTemplateThroughJob.json", headers=headers,
+                        data=json.dumps(cli_template), verify=False)
+    result.raise_for_status()
+    return result.json()
 
 def main():
+    job_result = submit_template_job(BASE, CLI_TEMPLATE)
 
-    headers={"Content-Type" : "application/json"}
-    result = requests.put(BASE + "op/cliTemplateConfiguration/deployTemplateThroughJob.json", headers=headers,
-                        data=json.dumps(CLI_TEMPLATE), verify=False)
-    result.raise_for_status()
-    print json.dumps(result.json(), indent=2)
+    print(json.dumps(job_result, indent=2))
 
-    jobname = result.json()['mgmtResponse']['cliTemplateCommandJobResult']['jobName']
-    wait_for_job(jobname)
+    jobname = job_result['mgmtResponse']['cliTemplateCommandJobResult']['jobName']
+    jobresponse = wait_for_job(BASE, jobname)
+    print(json.dumps(jobresponse, indent=2))
 
-    history = get_full_history(jobname)
-    print json.dumps(history, indent=2)
+    history = get_full_history(BASE, jobname)
+    print(json.dumps(history, indent=2))
 
 if __name__ == "__main__":
     main()

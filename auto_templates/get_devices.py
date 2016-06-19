@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+from __future__ import print_function
 import requests
 import json
 from argparse import ArgumentParser
@@ -10,18 +10,18 @@ from pi_config import PI, USER, PASSWORD
 BASE="https://%s:%s@%s/webacs/api/v1/" %(USER,PASSWORD,PI)
 
 def all_devices():
-    print "Getting all devices"
-    print "{0:6s} {1:10s}".format("ID", "IP address")
+    print ("Getting all devices")
+    print ("{0:6s} {1:10s}".format("ID", "IP address"))
     result = requests.get(BASE + "data/Devices.json?.full=true", verify=False)
     result.raise_for_status()
     for device in result.json()['queryResponse']['entity']:
-        print device['devicesDTO']['@id'], device['devicesDTO']['ipAddress']
+        print (device['devicesDTO']['@id'], device['devicesDTO']['ipAddress'])
 
 def device_by_id(id):
-    print "Getting a specific device"
+    print ("Getting a specific device")
     result = requests.get(BASE + "data/Devices/%s.json?.full=true" % id, verify=False)
     result.raise_for_status()
-    print json.dumps(result.json(), indent=2)
+    print (json.dumps(result.json(), indent=2))
 
 def device_by_ip(ip):
 
@@ -44,6 +44,6 @@ if __name__ == "__main__":
     if args.id:
         device_by_id(args.id)
     elif args.ip:
-        print json.dump(device_by_ip(args.ip), indent=2)
+        print (json.dumps(device_by_ip(args.ip), indent=2))
     else:
         all_devices()
