@@ -2,6 +2,9 @@
 
 This directory contains some example python code for using configuration templates.
 
+### Before you start
+make sure you edit the contents of pi_config.py to set the name of your PI server and the credentials for the API user.
+
 ### configure_interface.py
 is a script that applies the "Configure Interface" template to a device with the id of 610622.  It sets the interface "gig1/0/2" to access mode and assigns it to vlan 8.  It also updates the description.
 
