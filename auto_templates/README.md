@@ -3,7 +3,7 @@
 This directory contains some example python code for using configuration templates.
 
 ### Before you start
-make sure you edit the contents of pi_config.py to set the name of your PI server and the credentials for the API user.
+make sure you edit the contents of [pi_config.py](pi_config.py) to set the name of your PI server and the credentials for the API user.
 
 ### configure_interface.py
 is a script that applies the "Configure Interface" template to a device with the id of 610622.  It sets the interface "gig1/0/2" to access mode and assigns it to vlan 8.  It also updates the description.
@@ -22,9 +22,6 @@ ID     IP address
 610621 100.1.1.5
 610622 10.10.8.100
 ```
-
-### pi_config.py
-contains the credendials for the API user in PI
 
 ### get_template.py
 by default will get a list of all templates and the ID.
