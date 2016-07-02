@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from __future__ import print_function
 import requests
 import json
@@ -72,20 +73,24 @@ def process_template(template, options, device_ip):
 
     jobresponse = wait_for_job(BASE, jobname)
     job_status = jobresponse['queryResponse']['entity'][0]["jobSummaryDTO"]
+    logger.debug(json.dumps(jobresponse, indent=2))
+
     print('user:{username} run:{runStatus} result:{resultStatus} Start:{lastStartTime} Stop:{completionTime}'.
           format(username=job_status['username'], resultStatus=job_status['resultStatus'],
                  runStatus=job_status['runStatus'],
                  lastStartTime=job_status['lastStartTime'],
                  completionTime=job_status['completionTime']))
 
-    logger.debug(json.dumps(jobresponse, indent=2))
+
 
     history = get_full_history(BASE, jobname)
+    logger.debug(json.dumps(history, indent=2))
+
     if job_status['resultStatus'] == "SUCCESS":
         print('For full job history: op/jobService/runhistory.json?jobName={jobname}'.format(jobname=jobname))
     else:
         print ("job history:", json.dumps(history['mgmtResponse']['job']['runInstances']['runInstance']['results']['result'], indent=2))
-    logger.debug(json.dumps(history, indent=2))
+
 
 
 if __name__ == "__main__":

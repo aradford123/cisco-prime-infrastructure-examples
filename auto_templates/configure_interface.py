@@ -68,19 +68,25 @@ def get_full_history(base, jobname):
     return jobresult.json()
 
 def wait_for_job(base, jobname):
+    result = get_job_status(base, jobname)
+    jobnumber = result['queryResponse']['entityId'][0]['$']
+    total =0
     while True:
 
-        result = get_job_status(base, jobname)
+        jobdetail = get_job_detail(base, jobnumber)
+        logger.debug(json.dumps(jobdetail, indent=2))
+        status = jobdetail['queryResponse']['entity'][0]['jobSummaryDTO']
 
-        status = result['queryResponse']['entityId'][0]['@displayName'].split(",")[-1]
-
-        if status == "SCHEDULED":
-            logger.info("Job Status: {status}... sleeping 5".format(status=status))
+        if status['jobStatus'] != "COMPLETED":
+            logger.info("Job Status: {status}... sleeping 5 (total {total})".format(status=status['jobStatus'], total=total))
             time.sleep(5)
+            total += 5
+        elif 'runStatus' in status and status['runStatus'] != "COMPLETED":
+            logger.info("Run Status: {status}... sleeping 5 (total {total})".format(status=status['runStatus'],total=total))
+            time.sleep(5)
+            total += 5
         else:
-            json.dumps(result)
-            jobnumber = result['queryResponse']['entityId'][0]['$']
-            jobdetail = get_job_detail(base, jobnumber)
+            logger.debug(json.dumps(jobdetail, indent=2))
             return jobdetail
 
 def submit_template_job(base, cli_template):

@@ -37,6 +37,10 @@ def make_schema(template_name, variables):
      "templateName" : ""
      }
     }
+
+    # single variable need to be turned into a list
+    if isinstance(variables, dict):
+        variables = [variables]
     vars = [ {"name" : var['name'], "value" : "required" if var['required'] else  ""} for var in variables]
     template['cliTemplateCommand']['templateName'] = template_name
     template['cliTemplateCommand']['targetDevices']["targetDevice"]["variableValues"]["variableValue"] = vars
